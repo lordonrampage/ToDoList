@@ -27,7 +27,7 @@ const item2 = new Item({ item: "Apple" });
 const defaultItems = [item1, item2];
 
 const listSchema = new mongoose.Schema({
-  name: { type: String, items: [itemSchema] },
+  name: { type: String, item: [itemSchema] },
 });
 
 const List = mongoose.model("List", listSchema);
@@ -82,14 +82,14 @@ app.get("/:customListName", (req, res) => {
     if (!err) {
       if (!listFound) {
         // create a new list
-        const list = new List({ name: customListName, items: defaultItems });
+        const list = new List({ name: customListName, item: defaultItems });
         list.save();
-        // res.redirect("/" + customListName);
+        res.redirect("/" + customListName);
       } else {
         //   show an existing list
         res.render("/" + customListName, {
-          ListTitle: customListName,
-          items: listFound,
+          ListTitle: customListName.name,
+          items: listFound.item,
         });
       }
     } else {
