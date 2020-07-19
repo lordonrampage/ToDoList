@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const https = require("https");
 const date = require(__dirname + "/date.js");
+const _ = require("lodash");
 
 const mongoose = require("mongoose");
 const connection = mongoose.connect("mongodb://localhost:27017/toDoListDB", {
@@ -98,7 +99,7 @@ app.post("/delete", function (req, res) {
 });
 
 app.get("/:customListName", (req, res) => {
-  const customListName = req.params.customListName;
+  const customListName = _.capitalize(req.params.customListName);
 
   List.findOne({ name: customListName }, function (err, listFound) {
     if (!err) {
