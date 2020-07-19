@@ -54,9 +54,18 @@ app.get("/", function (req, res) {
 
 app.post("/", function (req, res) {
   let newItem = req.body.newItem;
-  const newItemToInsert = new Item({ item: newItem });
-  newItemToInsert.save();
-  res.redirect("/");
+  let ListName = req.body.list;
+
+  if (ListName === "Today") {
+    const newItemToInsert = new Item({ item: newItem });
+    newItemToInsert.save();
+    res.redirect("/");
+  } else {
+    List.findOne({ name: ListName }, function (err, foundList) {
+      foundList.items.push(newItemToInsert);
+      res.redirect("/" + ListName);
+    });
+  }
 });
 
 app.post("/delete", function (req, res) {
@@ -76,7 +85,7 @@ app.post("/delete", function (req, res) {
   });
 });
 
-app.get("/Home/:customListName", (req, res) => {
+app.get("/:customListName", (req, res) => {
   const customListName = req.params.customListName;
 
   List.findOne({ name: customListName }, function (err, listFound) {
@@ -85,10 +94,10 @@ app.get("/Home/:customListName", (req, res) => {
         // create a new list
         const list = new List({ name: customListName, items: [item1, item2] });
         list.save();
-        res.redirect("/Home/" + customListName);
+        res.redirect("/" + customListName);
       } else {
         //   show an existing list
-        res.render("/Home/" + customListName, {
+        res.render("/" + customListName, {
           ListTitle: customListName.name,
           items: listFound.items,
         });
