@@ -70,19 +70,31 @@ app.post("/", function (req, res) {
 
 app.post("/delete", function (req, res) {
   // console.log(req.body.checkbox);
-  toBeDeleted = req.body.checkbox;
+  const toBeDeleted = req.body.checkbox;
+  let listName = req.body.listName;
   // Item.find({ _id: toBeDeleted }).remove(() => {
   //   res.redirect("/");
   // });
-
-  Item.findByIdAndDelete({ _id: toBeDeleted }, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Successfully deleted");
-    }
-    res.redirect("/");
-  });
+  if (listName === "Today") {
+    Item.findByIdAndDelete({ _id: toBeDeleted }, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Successfully deleted");
+      }
+      res.redirect("/");
+    });
+  } else {
+    List.findOneAndUpdate(
+      { name: listName },
+      { $pull: { items: { _id: toBeDeleted } } },
+      function (err, updatedData) {
+        if (!err) {
+          res.redirect("/" + listName);
+        }
+      }
+    );
+  }
 });
 
 app.get("/:customListName", (req, res) => {
