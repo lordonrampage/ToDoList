@@ -27,7 +27,8 @@ const item2 = new Item({ item: "Apple" });
 const defaultItems = [item1, item2];
 
 const listSchema = new mongoose.Schema({
-  name: { type: String, item: [itemSchema] },
+  name: String,
+  items: [itemSchema],
 });
 
 const List = mongoose.model("List", listSchema);
@@ -75,21 +76,21 @@ app.post("/delete", function (req, res) {
   });
 });
 
-app.get("/:customListName", (req, res) => {
+app.get("/Home/:customListName", (req, res) => {
   const customListName = req.params.customListName;
 
   List.findOne({ name: customListName }, function (err, listFound) {
     if (!err) {
       if (!listFound) {
         // create a new list
-        const list = new List({ name: customListName, item: defaultItems });
+        const list = new List({ name: customListName, items: [item1, item2] });
         list.save();
-        res.redirect("/" + customListName);
+        res.redirect("/Home/" + customListName);
       } else {
         //   show an existing list
-        res.render("/" + customListName, {
+        res.render("/Home/" + customListName, {
           ListTitle: customListName.name,
-          items: listFound.item,
+          items: listFound.items,
         });
       }
     } else {
